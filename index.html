@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sama</title>
+<style>
+:root {
+  --bg-1: #160914;
+  --bg-2: #2c1028;
+  --bg-3: #5e1f46;
+  --accent: #ff5c8a;
+  --accent-soft: #ffc1d6;
+  --gold: #ffd89a;
+  --text: #fff6fb;
+  --muted: rgba(255, 246, 251, 0.72);
+  --glass: rgba(255, 255, 255, 0.12);
+  --border: rgba(255, 255, 255, 0.18);
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top, rgba(255, 216, 154, 0.22), transparent 28%),
+    radial-gradient(circle at 20% 20%, rgba(255, 92, 138, 0.25), transparent 25%),
+    radial-gradient(circle at 80% 30%, rgba(255, 193, 214, 0.18), transparent 22%),
+    linear-gradient(135deg, var(--bg-1), var(--bg-2) 45%, var(--bg-3));
+}
+
+.aurora,
+.aurora::before,
+.aurora::after {
+  position: absolute;
+  inset: auto;
+  content: "";
+  border-radius: 50%;
+  filter: blur(20px);
+}
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.aurora::before {
+  width: 40vw;
+  height: 40vw;
+  top: -10vw;
+  left: -8vw;
+  background: rgba(255, 92, 138, 0.18);
+  animation: drift 12s ease-in-out infinite alternate;
+}
+
+.aurora::after {
+  width: 32vw;
+  height: 32vw;
+  right: -6vw;
+  bottom: -8vw;
+  background: rgba(255, 216, 154, 0.16);
+  animation: drift 10s ease-in-out infinite alternate-reverse;
+}
+
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1.5px),
+    radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1.5px);
+  background-size: 130px 130px, 190px 190px;
+  background-position: 0 0, 45px 70px;
+  opacity: 0.45;
+  animation: twinkle 8s linear infinite;
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  isolation: isolate;
+}
+
+.screen {
+  position: absolute;
+  width: min(720px, calc(100vw - 32px));
+  min-height: 360px;
+  max-height: calc(100svh - 48px);
+  padding: 40px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+  transition: opacity 1.3s ease, transform 1.3s ease;
+  pointer-events: none;
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.screen.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at top, rgba(255, 216, 154, 0.14), transparent 26%),
+    rgba(12, 4, 12, 0.38);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.intro.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-card {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100svh - 48px);
+  padding: 38px 26px;
+  text-align: center;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.07));
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+  margin-inline: auto;
+}
+
+.intro-title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: 1.3;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.intro-text {
+  margin: 14px auto 0;
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  line-height: 1.95;
+  overflow-wrap: anywhere;
+}
+
+.start-button {
+  margin-top: 24px;
+  min-width: 170px;
+  padding: 15px 28px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff7ba4, #ff477a);
+  color: white;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.26);
+}
+
+.start-button:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+.eyebrow {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--gold);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 4.4rem);
+  line-height: 1.25;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 38rem;
+}
+
+.love {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 5.2rem);
+  line-height: 1.3;
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(255, 92, 138, 0.45),
+    0 0 40px rgba(255, 193, 214, 0.25);
+  animation: pulseGlow 1.8s ease-in-out infinite;
+}
+
+.love span {
+  display: inline-block;
+  color: var(--accent-soft);
+  transform-origin: center;
+  animation: heartbeat 1.2s ease-in-out infinite;
+}
+
+.hug-illustration {
+  width: min(220px, 52vw);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 216, 154, 0.22), transparent 30%),
+    radial-gradient(circle at 70% 35%, rgba(255, 92, 138, 0.2), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+}
+
+.hug-illustration svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
+}
+
+.final-note {
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.buttons {
+  position: relative;
+  width: min(420px, 100%);
+  height: 140px;
+  margin-top: 8px;
+  touch-action: manipulation;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.yes,
+.no {
+  position: absolute;
+  min-width: 132px;
+  padding: 14px 24px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+}
+
+.yes {
+  right: calc(50% + 12px);
+  top: 44px;
+  background: linear-gradient(135deg, #ff6a95, #ff3d73);
+  color: white;
+}
+
+.yes:hover {
+  transform: translateY(-4px) scale(1.03);
+}
+
+.no {
+  left: calc(50% + 12px);
+  top: 44px;
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: spin 14s linear infinite;
+}
+
+.ring.r2 {
+  width: 320px;
+  height: 320px;
+  animation-duration: 22s;
+  animation-direction: reverse;
+}
+
+.heart {
+  position: fixed;
+  bottom: -10vh;
+  color: rgba(255, 193, 214, 0.92);
+  text-shadow: 0 0 20px rgba(255, 92, 138, 0.45);
+  animation: floatUp linear forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.heart.ambient {
+  color: rgba(255, 193, 214, 0.22);
+  text-shadow: 0 0 14px rgba(255, 92, 138, 0.16);
+  z-index: 0;
+  filter: blur(0.2px);
+}
+
+.sparkle {
+  position: fixed;
+  width: 7px;
+  height: 7px;
+  background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0));
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shimmer 3s linear forwards;
+}
+
+.success {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 4, 10, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  z-index: 5;
+}
+
+.success.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.success-card {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100svh - 48px);
+  padding: 32px 24px;
+  text-align: center;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+}
+
+.success-card h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+}
+
+.success-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.9;
+}
+
+.embedded-audio {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  left: -9999px;
+  top: -9999px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(4vw, 2vw) scale(1.08); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.2); }
+  60% { transform: scale(1.05); }
+}
+
+@keyframes floatUp {
+  from {
+    transform: translateY(0) rotate(0deg) scale(0.9);
+    opacity: 0;
+  }
+  15% { opacity: 1; }
+  to {
+    transform: translateY(-118vh) rotate(18deg) scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  30% { opacity: 1; }
+  to {
+    transform: translateY(-140px) scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  body {
+    overflow: clip;
+  }
+
+  .screen {
+    width: min(100%, calc(100vw - 24px));
+    min-height: min(430px, calc(100svh - 36px));
+    max-height: calc(100svh - 24px);
+    padding: 28px 18px;
+    border-radius: 26px;
+    gap: 14px;
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+  }
+
+  .title {
+    font-size: clamp(1.7rem, 8vw, 2.8rem);
+  }
+
+  .subtitle,
+  .final-note,
+  .success-card p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .love {
+    font-size: clamp(2rem, 9vw, 3.2rem);
+  }
+
+  .hug-illustration {
+    width: min(180px, 50vw);
+  }
+
+  .buttons {
+    width: min(310px, 100%);
+    height: 150px;
+  }
+
+  .yes,
+  .no {
+    min-width: 110px;
+    padding: 13px 20px;
+    font-size: 0.94rem;
+  }
+
+  .yes {
+    right: 50%;
+    transform: translateX(56%);
+    top: 22px;
+  }
+
+  .no {
+    left: 50%;
+    transform: translateX(-56%);
+    top: 86px;
+  }
+
+  .ring {
+    width: 160px;
+    height: 160px;
+    opacity: 0.6;
+  }
+
+  .ring.r2 {
+    width: 240px;
+    height: 240px;
+  }
+
+  .success-card {
+    width: min(100%, calc(100vw - 24px));
+    padding: 28px 18px;
+    border-radius: 24px;
+  }
+
+  .success-card h2 {
+    font-size: clamp(1.5rem, 7vw, 2.2rem);
+  }
+
+  .intro-card {
+    width: min(100%, calc(100vw - 24px));
+    max-height: calc(100svh - 24px);
+    padding: 30px 18px;
+    border-radius: 26px;
+  }
+
+  .intro-title {
+    font-size: clamp(1.65rem, 7vw, 2.4rem);
+    line-height: 1.35;
+  }
+
+  .intro-text {
+    max-width: 24rem;
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+}
+
+@media (max-width: 390px) {
+  .screen {
+    padding: 24px 16px;
+  }
+
+  .buttons {
+    width: min(280px, 100%);
+    height: 144px;
+  }
+
+  .yes,
+  .no {
+    min-width: 102px;
+    font-size: 0.9rem;
+  }
+
+  .intro-title {
+    font-size: clamp(1.75rem, 9vw, 2.4rem);
+  }
+
+  .hug-illustration {
+    width: min(160px, 48vw);
+  }
+}
+
+@media (max-width: 480px) {
+  .intro {
+    padding: max(16px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  }
+
+  .intro-card {
+    width: calc(100vw - 28px);
+    padding: 24px 16px;
+    border-radius: 24px;
+  }
+
+  .intro-title {
+    font-size: clamp(1.5rem, 7.4vw, 2.1rem);
+    line-height: 1.4;
+  }
+
+  .intro-text {
+    max-width: 20rem;
+    font-size: 0.92rem;
+    line-height: 1.75;
+  }
+
+  .start-button {
+    min-width: 150px;
+    padding: 13px 22px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-height: 760px) {
+  .screen {
+    justify-content: flex-start;
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .intro-card,
+  .success-card {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .app {
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .screen,
+  .intro-card,
+  .success-card {
+    max-height: calc(100svh - 16px);
+  }
+
+  .screen {
+    width: min(700px, calc(100vw - 20px));
+    min-height: auto;
+    gap: 12px;
+    padding: 20px 18px;
+  }
+
+  .title {
+    font-size: clamp(1.5rem, 4.5vw, 2.6rem);
+  }
+
+  .love {
+    font-size: clamp(1.9rem, 5vw, 3rem);
+  }
+
+  .subtitle,
+  .final-note,
+  .intro-text,
+  .success-card p {
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  .buttons {
+    height: 126px;
+    width: min(320px, 100%);
+  }
+
+  .yes {
+    top: 18px;
+  }
+
+  .no {
+    top: 72px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="aurora"></div>
+  <div class="stars"></div>
+
+  <div class="intro" id="introScreen">
+    <div class="intro-card">
+      <div class="eyebrow">A Little Surprise</div>
+      <h1 class="intro-title">في حاجة صغيرة ليكي</h1>
+      <p class="intro-text">لو حاسة إنك مستعدة دوسي عالزر... والباقي هتعرفيه بنفسك.</p>
+      <button class="start-button" id="startExperience" type="button">جاهزة؟ ❤</button>
+    </div>
+  </div>
+
+  <main class="app">
+    <div class="ring"></div>
+    <div class="ring r2"></div>
+
+    <section id="s1" class="screen">
+      <div class="eyebrow">For Someone Special</div>
+      <h1 id="t1" class="title"></h1>
+      <p class="subtitle">كلمتين صغيرين، بس إحساسهم كبير أوي... ومكتوبين من كل قلبي.</p>
+    </section>
+
+    <section id="s2" class="screen">
+      <div class="eyebrow">A Soft Confession</div>
+      <h1 id="t2" class="title"></h1>
+      <p class="subtitle">كل مرة كنت بقول هتكلم، كنت بستنى اللحظة اللي تبقى أهدى وأحلى.</p>
+    </section>
+
+    <section id="s3" class="screen">
+      <div class="eyebrow">The Truth</div>
+      <h1 id="t3" class="title"></h1>
+      <p class="subtitle">وسط كل التفاصيل، كان في حاجة واحدة واضحة جدًا جوايا.</p>
+    </section>
+
+    <section id="s4" class="screen">
+      <div class="eyebrow">My Heart</div>
+      <h1 class="love">إنتِي روح  روحي يا سماسيمو<span>❤</span></h1>
+      <p class="final-note">ولو في سؤال مهم فعلًا... فهو ينفع أفضل قريب من قلبك على طول؟</p>
+
+      <div class="buttons">
+        <button class="yes" onclick="accepted()">أيوه ❤</button>
+        <button class="no" id="noBtn">مكسوفة أقول 🙈</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="success" id="successMessage">
+    <div class="success-card">
+      <h2>كنت شايف إن قلبك أحنّ من أي كلام ممكن يتقال</h2>
+      <p>وعد مني إني أخلي كل لحظة بينا أحن وألطف وأجمل بكتير من الخيال ❤</p>
+    </div>
+  </div>
+
+  <audio id="acceptanceSong" class="embedded-audio" preload="auto"></audio>
+
+<script>
+const sequence = [
+  { id: "t1", text: "في حاجة من زمان نفسي أقولها لك..." },
+  { id: "t2", text: "بس كنت عايزاها توصل لك بطريقة تليق بيكي..." },
+  { id: "t3", text: "والحقيقة ببساطة... إنتي بالنسبالي حاجة مميزة أوي." }
+];
+
+let audioContext;
+let romanceInterval;
+let masterGain;
+let delayNode;
+let delayFeedback;
+let experienceStarted = false;
+let acceptanceReached = false;
+let songStarted = false;
+const songStartSeconds = 0;
+const embeddedSongData = "Albumaty.Com_amyn_khtab_klby_mharb-[AudioTrimmer.com].mp3";
+
+const melody = [
+  { chord: [261.63, 329.63, 392.0, 523.25], bass: 130.81, lead: [659.25, 587.33, 523.25], duration: 4.2 },
+  { chord: [220.0, 277.18, 329.63, 440.0], bass: 110.0, lead: [554.37, 493.88, 440.0], duration: 4.0 },
+  { chord: [174.61, 261.63, 329.63, 392.0], bass: 87.31, lead: [493.88, 440.0, 392.0], duration: 4.4 },
+  { chord: [196.0, 293.66, 369.99, 392.0], bass: 98.0, lead: [523.25, 493.88, 440.0], duration: 4.0 }
+];
+
+function playRomanticTone(startTime, frequency, duration, volume, type = "sine", attack = 0.28, release = duration, pan = 0) {
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const lowpass = audioContext.createBiquadFilter();
+  const stereo = audioContext.createStereoPanner();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, startTime);
+  oscillator.detune.setValueAtTime(-6, startTime);
+  oscillator.detune.linearRampToValueAtTime(6, startTime + duration);
+
+  lowpass.type = "lowpass";
+  lowpass.frequency.setValueAtTime(type === "sine" ? 820 : 1180, startTime);
+  lowpass.Q.value = 0.18;
+
+  stereo.pan.setValueAtTime(pan, startTime);
+
+  gain.gain.setValueAtTime(0.0001, startTime);
+  gain.gain.exponentialRampToValueAtTime(volume, startTime + attack);
+  gain.gain.exponentialRampToValueAtTime(volume * 0.72, startTime + release * 0.42);
+  gain.gain.exponentialRampToValueAtTime(0.0001, startTime + release);
+
+  oscillator.connect(lowpass);
+  lowpass.connect(gain);
+  gain.connect(stereo);
+  stereo.connect(masterGain);
+  stereo.connect(delayNode);
+
+  oscillator.start(startTime);
+  oscillator.stop(startTime + duration + 0.05);
+}
+
+function playRomanticLoop() {
+  if (!audioContext) {
+    return;
+  }
+
+  let cursor = audioContext.currentTime + 0.12;
+  melody.forEach((step) => {
+    step.chord.forEach((frequency, index) => {
+      playRomanticTone(
+        cursor,
+        frequency,
+        step.duration,
+        0.0095 - index * 0.0011,
+        "sine",
+        0.85,
+        step.duration,
+        -0.24 + index * 0.16
+      );
+    });
+
+    playRomanticTone(cursor, step.bass, step.duration * 0.96, 0.0075, "sine", 0.42, step.duration * 0.96, -0.08);
+    playRomanticTone(cursor + 0.9, step.lead[0], step.duration * 0.26, 0.0048, "triangle", 0.12, step.duration * 0.26, 0.18);
+    playRomanticTone(cursor + 1.75, step.lead[1], step.duration * 0.24, 0.0042, "triangle", 0.1, step.duration * 0.24, -0.14);
+    playRomanticTone(cursor + 2.55, step.lead[2], step.duration * 0.32, 0.0038, "triangle", 0.11, step.duration * 0.32, 0.12);
+    playRomanticTone(cursor + 3.2, step.lead[1] * 0.5, step.duration * 0.18, 0.0028, "sine", 0.08, step.duration * 0.18, 0.1);
+    cursor += step.duration;
+  });
+}
+
+function startRomanticMusic() {
+  if (audioContext) {
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+    return;
+  }
+
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) {
+    return;
+  }
+
+  audioContext = new AudioCtx();
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  masterGain = audioContext.createGain();
+  masterGain.gain.value = 0.72;
+  masterGain.connect(audioContext.destination);
+
+  delayNode = audioContext.createDelay(1.2);
+  delayNode.delayTime.value = 0.42;
+  delayFeedback = audioContext.createGain();
+  delayFeedback.gain.value = 0.22;
+  delayNode.connect(delayFeedback);
+  delayFeedback.connect(delayNode);
+  delayNode.connect(masterGain);
+
+  playRomanticLoop();
+
+  const loopDuration = melody.reduce((total, step) => total + step.duration, 0) * 1000;
+  romanceInterval = setInterval(() => {
+    if (audioContext && audioContext.state === "running") {
+      playRomanticLoop();
+    }
+  }, loopDuration - 120);
+}
+
+function startExperience() {
+  if (experienceStarted) {
+    return;
+  }
+
+  experienceStarted = true;
+  document.getElementById("introScreen").classList.add("hidden");
+  document.getElementById("s1").classList.add("active");
+  startRomanticMusic();
+  playSequence();
+}
+
+function playAcceptanceSong() {
+  const acceptanceSong = document.getElementById("acceptanceSong");
+  if (!songStarted) {
+    acceptanceSong.src = embeddedSongData;
+    songStarted = true;
+  }
+
+  acceptanceSong.currentTime = songStartSeconds;
+  const playPromise = acceptanceSong.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {
+    });
+  }
+}
+
+function typeText(element, text, speed, callback) {
+  let i = 0;
+  element.textContent = "";
+
+  function write() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i += 1;
+      setTimeout(write, speed);
+    } else if (callback) {
+      setTimeout(callback, 1400);
+    }
+  }
+
+  write();
+}
+
+function switchScreen(currentId, nextId) {
+  document.getElementById(currentId).classList.remove("active");
+  setTimeout(() => {
+    document.getElementById(nextId).classList.add("active");
+  }, 700);
+}
+
+function playSequence(index = 0) {
+  if (index >= sequence.length) {
+    startHearts();
+    startSparkles();
+    switchScreen("s3", "s4");
+    return;
+  }
+
+  const currentScreen = `s${index + 1}`;
+  const nextScreen = `s${index + 2}`;
+  const item = sequence[index];
+
+  typeText(document.getElementById(item.id), item.text, 55, () => {
+    switchScreen(currentScreen, nextScreen);
+    setTimeout(() => playSequence(index + 1), 1450);
+  });
+}
+
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function createHeart(burst = false) {
+  const heart = document.createElement("div");
+  heart.className = "heart";
+  heart.textContent = Math.random() > 0.5 ? "❤" : "♥";
+  heart.style.left = randomRange(4, 96) + "vw";
+  heart.style.fontSize = randomRange(burst ? 20 : 16, burst ? 42 : 28) + "px";
+  heart.style.animationDuration = randomRange(4.8, 8.5) + "s";
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 9000);
+}
+
+function createAmbientHeart() {
+  const heart = document.createElement("div");
+  heart.className = "heart ambient";
+  heart.textContent = Math.random() > 0.5 ? "❤" : "♥";
+  heart.style.left = randomRange(2, 98) + "vw";
+  heart.style.fontSize = randomRange(14, 30) + "px";
+  heart.style.animationDuration = randomRange(7.5, 12.5) + "s";
+  heart.style.opacity = randomRange(0.14, 0.3);
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 13000);
+}
+
+function createSparkle(x, y) {
+  const sparkle = document.createElement("div");
+  sparkle.className = "sparkle";
+  sparkle.style.left = x + "px";
+  sparkle.style.top = y + "px";
+  document.body.appendChild(sparkle);
+  setTimeout(() => sparkle.remove(), 3000);
+}
+
+function startHearts() {
+  setInterval(() => createHeart(false), 360);
+}
+
+function startSparkles() {
+  setInterval(() => {
+    createSparkle(
+      randomRange(window.innerWidth * 0.15, window.innerWidth * 0.85),
+      randomRange(window.innerHeight * 0.15, window.innerHeight * 0.85)
+    );
+  }, 420);
+}
+
+function startAmbientHearts() {
+  for (let i = 0; i < 8; i += 1) {
+    setTimeout(() => createAmbientHeart(), i * 320);
+  }
+
+  setInterval(() => {
+    createAmbientHeart();
+  }, 950);
+}
+
+const noBtn = document.getElementById("noBtn");
+const buttons = document.querySelector(".buttons");
+
+function moveNoButton() {
+  const areaWidth = buttons.clientWidth - noBtn.offsetWidth;
+  const areaHeight = buttons.clientHeight - noBtn.offsetHeight;
+  const x = randomRange(0, Math.max(areaWidth, 8));
+  const y = randomRange(0, Math.max(areaHeight, 8));
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+}
+
+["mouseenter", "touchstart", "click"].forEach((eventName) => {
+  noBtn.addEventListener(eventName, (event) => {
+    event.preventDefault();
+    moveNoButton();
+    createHeart(true);
+  });
+});
+
+document.addEventListener("mousemove", (event) => {
+  const finalScreen = document.getElementById("s4");
+  if (!finalScreen.classList.contains("active")) {
+    return;
+  }
+
+  const rect = noBtn.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+
+  if (distance < 140) {
+    moveNoButton();
+  }
+});
+
+document.addEventListener("touchstart", (event) => {
+  const finalScreen = document.getElementById("s4");
+  if (!finalScreen.classList.contains("active")) {
+    return;
+  }
+
+  const touch = event.touches[0];
+  if (!touch) {
+    return;
+  }
+
+  const rect = noBtn.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const distance = Math.hypot(touch.clientX - centerX, touch.clientY - centerY);
+
+  if (distance < 120) {
+    moveNoButton();
+  }
+}, { passive: true });
+
+function accepted() {
+  document.getElementById("successMessage").classList.add("show");
+  acceptanceReached = true;
+
+  if (audioContext && audioContext.state !== "suspended") {
+    if (romanceInterval) {
+      clearInterval(romanceInterval);
+    }
+    audioContext.suspend();
+  }
+
+  playAcceptanceSong();
+
+  for (let i = 0; i < 18; i += 1) {
+    setTimeout(() => createHeart(true), i * 120);
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!acceptanceReached && audioContext && document.visibilityState === "visible" && audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+});
+document.getElementById("startExperience").addEventListener("click", startExperience);
+startAmbientHearts();
+</script>
+</body>
+</html>
