@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sama | Romantic Moment</title>
+  <style>
+    :root {
+      --ink: #fff7fb;
+      --muted: rgba(255, 247, 251, 0.76);
+      --rose: #ff4f88;
+      --rose-soft: #ffc2d7;
+      --gold: #ffd58a;
+      --night: #120713;
+      --plum: #351326;
+      --glass: rgba(255, 255, 255, 0.12);
+      --line: rgba(255, 255, 255, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 50% 14%, rgba(255, 213, 138, 0.22), transparent 24rem),
+        radial-gradient(circle at 16% 22%, rgba(255, 79, 136, 0.22), transparent 20rem),
+        radial-gradient(circle at 86% 68%, rgba(255, 194, 215, 0.18), transparent 22rem),
+        linear-gradient(145deg, #09030a 0%, var(--night) 38%, var(--plum) 100%);
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      isolation: isolate;
+    }
+
+    .page::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.88) 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(255,213,138,0.5) 1px, transparent 1.8px);
+      background-size: 140px 140px, 220px 220px;
+      background-position: 0 0, 50px 90px;
+      opacity: 0.32;
+      animation: twinkle 8s ease-in-out infinite;
+    }
+
+    .page::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 68px 68px;
+      mask-image: radial-gradient(circle at center, black, transparent 72%);
+      opacity: 0.25;
+    }
+
+    .glow {
+      position: fixed;
+      inset: auto;
+      width: 44vw;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      filter: blur(48px);
+      opacity: 0.42;
+      z-index: -1;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .glow.one {
+      top: -14vw;
+      right: -10vw;
+      background: #ff4f88;
+    }
+
+    .glow.two {
+      left: -14vw;
+      bottom: -16vw;
+      background: #ffd58a;
+      animation-delay: -4s;
+    }
+
+    .stage {
+      width: min(1180px, 100%);
+      min-height: min(720px, calc(100svh - 56px));
+      display: grid;
+      grid-template-columns: minmax(300px, 0.95fr) minmax(360px, 1.05fr);
+      align-items: center;
+      gap: clamp(22px, 4vw, 54px);
+      padding: clamp(22px, 4vw, 48px);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055)),
+        radial-gradient(circle at 20% 20%, rgba(255, 213, 138, 0.12), transparent 24rem);
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .portrait-wrap {
+      position: relative;
+      width: min(430px, 100%);
+      justify-self: center;
+      aspect-ratio: 4 / 5;
+      display: grid;
+      place-items: center;
+      transform: rotate(-2deg);
+    }
+
+    .portrait-wrap::before {
+      content: "";
+      position: absolute;
+      inset: -20px;
+      border-radius: 42% 58% 48% 52% / 55% 45% 55% 45%;
+      background:
+        conic-gradient(from 160deg, transparent, rgba(255,213,138,0.95), rgba(255,79,136,0.95), transparent 68%);
+      filter: blur(1px);
+      animation: halo 8s linear infinite;
+    }
+
+    .portrait-wrap::after {
+      content: "♥";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      left: -38px;
+      bottom: -28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: rgba(255, 194, 215, 0.9);
+      font-size: 5rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      transform: rotate(10deg);
+    }
+
+    .portrait-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 12px;
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+    }
+
+    .portrait-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: 26px;
+      filter: contrast(1.08) saturate(1.12) brightness(1.04);
+    }
+
+    .portrait-card .shine {
+      position: absolute;
+      inset: 12px;
+      border-radius: 26px;
+      background:
+        linear-gradient(120deg, transparent 12%, rgba(255,255,255,0.16), transparent 35%),
+        radial-gradient(circle at 58% 34%, rgba(255,213,138,0.28), transparent 26%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .photo-petals {
+      position: absolute;
+      inset: 12px;
+      border-radius: 26px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .photo-petal {
+      position: absolute;
+      top: -42px;
+      width: 22px;
+      height: 14px;
+      border-radius: 100% 0 100% 0;
+      background:
+        radial-gradient(circle at 28% 28%, rgba(255,255,255,0.85), transparent 28%),
+        linear-gradient(135deg, #ffe1eb 0%, #ff7aa6 52%, #b91345 100%);
+      box-shadow: 0 4px 12px rgba(128, 0, 44, 0.24);
+      opacity: 0;
+      will-change: transform, opacity;
+      animation: photoPetalFall linear forwards;
+    }
+
+    .message {
+      position: relative;
+      padding-block: 16px;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--gold);
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 24ch;
+      font-size: clamp(1.65rem, 3.15vw, 3.45rem);
+      line-height: 1.38;
+      letter-spacing: 0;
+      text-shadow: 0 0 28px rgba(255, 79, 136, 0.36);
+    }
+
+    .copy {
+      margin: 18px 0 0;
+      max-width: 38rem;
+      color: var(--muted);
+      font-size: clamp(0.94rem, 1.55vw, 1.1rem);
+      line-height: 1.85;
+    }
+
+    .love-note {
+      position: relative;
+      margin: 26px 0 0;
+      padding: 20px 22px;
+      max-width: 42rem;
+      border: 1px solid rgba(255, 213, 138, 0.26);
+      border-radius: 22px;
+      background:
+        linear-gradient(135deg, rgba(255, 213, 138, 0.13), rgba(255, 79, 136, 0.11)),
+        rgba(255, 255, 255, 0.055);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+
+    .love-note p {
+      margin: 0;
+      color: #fff8fb;
+      font-size: clamp(1.05rem, 2.2vw, 1.34rem);
+      line-height: 2;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .primary,
+    .ghost {
+      min-height: 52px;
+      padding: 0 24px;
+      border-radius: 999px;
+      color: white;
+      transition: transform 0.24s ease, box-shadow 0.24s ease;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #ff75a1, #ff356f);
+      box-shadow: 0 18px 36px rgba(255, 53, 111, 0.28);
+    }
+
+    .ghost {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .primary:hover,
+    .ghost:hover {
+      transform: translateY(-3px);
+    }
+
+    .floating-heart,
+    .petal,
+    .spark {
+      position: fixed;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .floating-heart {
+      bottom: -40px;
+      color: rgba(255, 194, 215, 0.9);
+      text-shadow: 0 0 18px rgba(255, 79, 136, 0.45);
+      animation: floatUp linear forwards;
+    }
+
+    .petal {
+      top: -50px;
+      width: 16px;
+      height: 10px;
+      border-radius: 100% 0 100% 0;
+      background: linear-gradient(135deg, #ffd1df, #ff6d9c);
+      opacity: 0.74;
+      animation: petalFall linear forwards;
+    }
+
+    .spark {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, rgba(255,255,255,0));
+      animation: sparkle 2.6s ease-out forwards;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(7, 2, 8, 0.56);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      width: min(560px, 100%);
+      padding: 30px 24px;
+      text-align: center;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at top, rgba(255,213,138,0.16), transparent 16rem),
+        rgba(37, 12, 31, 0.86);
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .modal-card h2 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.8rem);
+      line-height: 1.18;
+    }
+
+    .modal-card p {
+      margin: 16px auto 0;
+      max-width: 31rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.9;
+    }
+
+    @keyframes drift {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(34px, 24px, 0) scale(1.08); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.22; }
+      50% { opacity: 0.48; }
+    }
+
+    @keyframes halo {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+      15% { opacity: 1; }
+      100% { transform: translateY(-118vh) rotate(22deg) scale(1.45); opacity: 0; }
+    }
+
+    @keyframes petalFall {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+      8% { opacity: 0.85; }
+      100% { transform: translateY(112vh) translateX(-90px) rotate(260deg); opacity: 0; }
+    }
+
+    @keyframes photoPetalFall {
+      0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.82); opacity: 0; }
+      10% { opacity: 0.95; }
+      78% { opacity: 0.92; }
+      100% { transform: translate3d(var(--sway), var(--fall), 0) rotate(var(--spin)) scale(1.08); opacity: 0; }
+    }
+
+    @keyframes sparkle {
+      0% { transform: scale(0.4); opacity: 0; }
+      25% { opacity: 1; }
+      100% { transform: translateY(-110px) scale(1.8); opacity: 0; }
+    }
+
+    @media (max-width: 820px) {
+      .page {
+        padding: 16px;
+      }
+
+      .stage {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        padding: 18px;
+        border-radius: 26px;
+      }
+
+      .portrait-wrap {
+        width: min(330px, 82vw);
+        aspect-ratio: 1 / 1.16;
+        order: -1;
+      }
+
+      .portrait-wrap::after {
+        width: 108px;
+        height: 108px;
+        left: -16px;
+        bottom: -16px;
+        font-size: 3.6rem;
+      }
+
+      h1 {
+        max-width: 100%;
+        font-size: clamp(1.55rem, 7vw, 2.35rem);
+        line-height: 1.42;
+      }
+
+      .copy,
+      .love-note p {
+        line-height: 1.78;
+      }
+
+      .actions {
+        align-items: stretch;
+      }
+
+      .primary,
+      .ghost {
+        flex: 1 1 150px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .stage {
+        gap: 14px;
+      }
+
+      .love-note {
+        padding: 16px;
+        border-radius: 18px;
+      }
+
+      .copy {
+        margin-top: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+
+  <main class="page">
+    <section class="stage" aria-label="رسالة رومانسية لسما">
+      <div class="portrait-wrap">
+        <div class="portrait-card">
+          <img src="assets/sama-romantic-first.png" alt="صورة سما الرومانسية">
+          <span class="shine" aria-hidden="true"></span>
+          <div class="photo-petals" id="photoPetals" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="message">
+        <h1>لو كان للحب مرآة تعكسه، لاختار ملامحك ليرى الناس أجمل معانيه</h1>
+        <p class="copy">
+          إنتِي مش مجرد شخص دخل حياتي، إنتِي الأمان اللي بيطمن قلبي من غير ما يتقال كلام،
+          والابتسامة اللي بتقدر تغيّر شكل يوم كامل. وجودك مختلف، له قيمة ومعنى نادر ألاقيه في حد.
+          وكل مرة بشوفك، بحس إن الدنيا لسه فيها حاجات حلوة تستحق إننا نفرح بيها ونتمسك بيها.
+          يمكن إنتِي مش مدركة قد إيه وجودك بيفرق لكن يكفي إنه بيخلّي كل حاجة حوالي أهدى وأجمل،
+          وبيخلّي قلبي مطمّن لمجرد إنك موجودة.
+        </p>
+
+        <div class="love-note">
+          <p id="typedText"></p>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="startBtn" type="button">جاهزه</button>
+          <button class="ghost" id="surpriseBtn" type="button">افتحي المفاجأة</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="modal">
+    <div class="modal-card">
+      <h2>في تفاصيلك جمال يلفت العين</h2>
+      <p>
+        وفي ملامحك دفء يطمئن القلب؛ وكأن الجمال والحب اتفقا أن يظهرا معًا فيك.
+        لو كان للجمال معنى، كان هيبان في تفاصيلك. ولو كان للحب ملامح،
+        كانت ملامحك أول تعريف ليه.
+      </p>
+    </div>
+  </div>
+
+  <audio id="song" preload="auto" src="Albumaty.Com_amyn_khtab_klby_mharb-[AudioTrimmer.com].mp3"></audio>
+
+  <script>
+    const typedText = document.getElementById("typedText");
+    const startBtn = document.getElementById("startBtn");
+    const surpriseBtn = document.getElementById("surpriseBtn");
+    const modal = document.getElementById("modal");
+    const song = document.getElementById("song");
+    const photoPetals = document.getElementById("photoPetals");
+
+    const note = "في وسط كل الزحمة، في حاجة واحدة ثابتة: إن وجودك بيخلي الدنيا أهدى، أحلى، وأقرب للقلب يا سما.";
+    let typed = false;
+    let effectsStarted = false;
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function typeNote() {
+      if (typed) return;
+      typed = true;
+      typedText.textContent = "";
+
+      [...note].forEach((letter, index) => {
+        setTimeout(() => {
+          typedText.textContent += letter;
+        }, index * 45);
+      });
+    }
+
+    function makeHeart(big = false) {
+      const heart = document.createElement("div");
+      heart.className = "floating-heart";
+      heart.textContent = Math.random() > 0.5 ? "♥" : "❤";
+      heart.style.left = random(4, 96) + "vw";
+      heart.style.fontSize = random(big ? 26 : 16, big ? 48 : 30) + "px";
+      heart.style.animationDuration = random(5.2, 8.8) + "s";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 9200);
+    }
+
+    function makePetal() {
+      const petal = document.createElement("div");
+      petal.className = "petal";
+      petal.style.left = random(4, 98) + "vw";
+      petal.style.animationDuration = random(6.5, 10.5) + "s";
+      petal.style.animationDelay = random(0, 1.2) + "s";
+      document.body.appendChild(petal);
+      setTimeout(() => petal.remove(), 12000);
+    }
+
+    function makePhotoPetal(big = false) {
+      const petal = document.createElement("span");
+      petal.className = "photo-petal";
+      const fallDistance = photoPetals.clientHeight + 92;
+      petal.style.left = random(3, 94) + "%";
+      petal.style.width = random(big ? 22 : 14, big ? 34 : 24) + "px";
+      petal.style.height = random(big ? 14 : 9, big ? 22 : 15) + "px";
+      petal.style.setProperty("--sway", random(-72, 72) + "px");
+      petal.style.setProperty("--fall", fallDistance + "px");
+      petal.style.setProperty("--spin", random(180, 520) + "deg");
+      petal.style.animationDuration = random(4.8, 7.8) + "s";
+      petal.style.animationDelay = random(0, 0.28) + "s";
+      photoPetals.appendChild(petal);
+      setTimeout(() => petal.remove(), 8600);
+    }
+
+    function startPhotoPetalRain() {
+      for (let i = 0; i < 24; i += 1) {
+        setTimeout(() => makePhotoPetal(i % 4 === 0), i * 95);
+      }
+    }
+
+    function makeSpark() {
+      const spark = document.createElement("div");
+      spark.className = "spark";
+      spark.style.left = random(window.innerWidth * 0.12, window.innerWidth * 0.88) + "px";
+      spark.style.top = random(window.innerHeight * 0.18, window.innerHeight * 0.82) + "px";
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 2700);
+    }
+
+    function startEffects() {
+      if (effectsStarted) return;
+      effectsStarted = true;
+      setInterval(() => makeHeart(false), 520);
+      setInterval(makePetal, 760);
+      startPhotoPetalRain();
+      setInterval(() => makePhotoPetal(false), 150);
+      setInterval(makeSpark, 620);
+    }
+
+    function playSong() {
+      song.volume = 0.74;
+      const playPromise = song.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {});
+      }
+    }
+
+    startBtn.addEventListener("click", () => {
+      typeNote();
+      startEffects();
+      playSong();
+      for (let i = 0; i < 12; i += 1) {
+        setTimeout(() => makeHeart(true), i * 120);
+      }
+    });
+
+    surpriseBtn.addEventListener("click", () => {
+      modal.classList.add("show");
+      startEffects();
+      for (let i = 0; i < 22; i += 1) {
+        setTimeout(() => {
+          makeHeart(true);
+          makePetal();
+          makePhotoPetal(true);
+        }, i * 80);
+      }
+      startPhotoPetalRain();
+    });
+
+    modal.addEventListener("click", () => {
+      modal.classList.remove("show");
+    });
+
+  </script>
+</body>
+</html>
